@@ -1,150 +1,104 @@
-//localStorage = ده المكان Browser نستطيع تخزين بيانات فيه
-//JSON = لانه يخزن البيانات كنصوص استرنج علشان كده هنحوله ل اراااي array
-let tasks = JSON.parse(localStorage.getItem("#tasks")) || [];
+// //localStorage = ده المكان Browser نستطيع تخزين بيانات فيه
+// //JSON = لانه يخزن البيانات كنصوص استرنج علشان كده هنحوله ل اراااي array
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 // SHOW TASKS WHEN PAGE LOADS
-displayTasks();
+ let taskName = document.querySelector("#taskName").value; // input 1
+ let taskDescription =document.querySelector("#taskDescription").value; // input 2
+ let count = document.querySelector("#count").value; // input 3
+ console.log(taskName, taskDescription, count);
 function addTask() { //IMP//  عند نداء علي ده نفذ الكود الي جوه كله 
     // Get values from inputs
-    // document.querySelector("taskName") = html للحصول علي قيمه انبوت داخل 
+    // document.getElementById("taskName") = html للحصول علي قيمه انبوت داخل 
     // value = Input معنها القيمة التي كتبها المستخدم داخل 
-    // trim() تحذف المسافات الزائدة من بداية ونهاية النص.   //"   Hello   ".trim() تصبح:"Hello"
-    let taskName = document.querySelector("#taskName").value; // input 1
-    let taskDescription =document.querySelector("#taskDescription").value; // input 2
+    // تحذف المسافات الزائدة من بداية ونهاية النص.   //"   Hello   ".trim() تصبح:"Hello"
+    let taskName = document.getElementById("taskName").value; // input 1
+    let taskDescription =document.getElementById("taskDescription").value; // input 2
+    let count = document.getElementById("count").value; // input 3
     // Check empty inputs
     //  || او 
-    if (taskName === "" || taskDescription === "") { // لو المكان فارج طلع الامر ده 
-        alert("Please enter task name and description"); // alert من داخل السيلفر او البراوزر
+    if (taskName === "" || taskDescription === "" || count === "") { // لو المكان فارج طلع الامر ده 
+        alert("Please enter task name and description");
         return; //Function أوقف الـ 
         //  هنا ولا تكمل باقي الكود.
     } 
     // Create new task //جديد Object إنشاء 
-    // انا الي هدخلو
     let newTask = {  //*** */
         // id: Date.now(),
-        name: taskName, // ده انا الي هدخلو // input 1
-        description: taskDescription, //  ده انا الي هدخلو // input 2
+        name: taskName, // ده انا الي هدخلو 
+        description: taskDescription, //  ده انا الي هدخلو 
+        count: count, //  ده انا الي هدخلو 
         status: "created"
     };
     // push = array اضافه عنصر الي 
-    tasks.push(newTask);//*** */
-    saveTasks(); // localStorage.Tasks  احفظ الـ الموجودة حالياً في  
+    if(newTask.count > 1){
+        for (let i = 0; i < newTask.count; i++) {
+             tasks.push(newTask);
+    }
+     }else{
+             tasks.push(newTask);
+    }
+
+    // tasks.push(newTask);//*** */
+    // saveTasks();
+     // localStorage.Tasks  احفظ الـ الموجودة حالياً في  
     // Clear inputs 
-    document.querySelector("#taskName").value = ""; 
-    document.querySelector("#taskDescription").value = "";
+    document.getElementById("taskName").value = ""; 
+    document.getElementById("taskDescription").value = "";
+    document.getElementById("count").value = "";
     // Display tasks
-    displayTasks();
+    // displayTasks();
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    cleardata()
+    showdata()
 }
-
-function displayTasks(filter = "all") {
-    let tableBody = document.querySelector("#taskTableBody");
-    // Clear old rows فاضي الجدول قبل ما تعرض البيانات الجديدة
-    tableBody.innerHTML = "";
-    // Filter tasks
-    let filteredTasks = tasks.filter(function (task) {
-        if (filter === "all") {
-            return true;
-        }
-        return task.status === filter;
-    });
-    // Create HTML for every task
-    filteredTasks.forEach(function (task) {
-        let row = document.createElement("tr");
-        row.innerHTML = `
-            <td>
-                ${task.name}
-            </td>
-            <td>
-                ${task.description}
-            </td>
-            <td>
-                <span class="${
-                    task.status === "done"
-                        ? "status-done"
-                        : "status-created"
-                }">
-                   ${
-                        task.status === "done"
-                            ? "Done"
-                            : "Created"
-                    }
-                </span>
-            </td>
-            <td>
-                <button class="action-btn delete-btn" onclick="deleteTask(${task.id})" >
-                 <i class="bi bi-trash"></i>
-                </button>
-                <button
-                    class="action-btn edit-btn" onclick="openEditModal(${task.id})" >
-                   <i class="bi bi-pencil-square"></i>
-                </button>
-                ${
-                    task.status === "created" ? `
-                    <button class="action-btn done-btn"onclick="markAsDone(${task.id})">
-                        <i class="bi bi-check-lg"></i>
-                    </button>
-                    `
-                    : ""
-                }
-            </td>
-
-        `;
-        tableBody.appendChild(row);
-
-    });
-
+function cleardata() {
+     taskName.value = "";
+     taskDescription.value = "";
+     count.value = "";
 }
-
-function deleteTask(id) {
-    let confirmDelete =  confirm("Are you sure you want to delete this task?");
-    if (!confirmDelete) {
-        return;
+//READ //
+function showdata() {
+    //  let tableBody = document.getElementById("taskTableBody");}
+     let table ='';
+    for (let i = 0; i < tasks.length; i++) {
+        table += `<tr>
+        <td>${tasks[i].name}</td>
+        <td>${tasks[i].description}</td>
+        <td>${tasks[i].status}</td>
+        <td>${tasks[i].count}</td>
+        <td><div class="filter-buttons">
+            <!-- 1 -->
+            <button class="btn btn-info" onclick="filterTasks('all')">All </button> <!-- 1 -->
+            <button class="btn btn-success" onclick="filterTasks('done')">Done</button>  <!-- 2 -->
+            <button class="btn btn-secondary" onclick="updateTask()">Created</button>  <!-- 3 -->
+            <button class="btn btn-danger" onclick="deleteTask(${i})">delete</button>  <!-- 3 -->
+        </div>
+        </tr>`;    
     }
-    tasks = tasks.filter(function (task) {
-        return task.id !== id;
-    });
-    // saveTasks();
-    displayTasks();
+//    let tableBod ='',
+ document.querySelector("#taskTableBody").innerHTML =table;
 }
-// MARK TASK AS DONE
-function markAsDone(id) {
-    let task = tasks.find(function (task) {
-        return task.id === id;
-    });
-    if (task) {
-        task.status = "done";
-    }
-    // saveTasks();
-    displayTasks();
-}
+showdata()  // يفضل لما اعمل ريفريش للصفحه يفضل يعرض البيانات الي موجوده في اللستوريج
 
-// FILTER TASKS
-function filterTasks(type) {
-    displayTasks(type);
+// delete //
+
+function deleteTask(i){
+    tasks.splice(i, 1); // delete 1 element from index i
+    localStorage.setItem("tasks", JSON.stringify(tasks)); // update localStorage
+    showdata(); // refresh the displayed data // علشان لما احذف عنصر من الجدول يتحدث الجدول ويظهرلي العناصر المتبقيه
 }
-// OPEN EDIT MODAL 
-function openEditModal(id) {
-    let task = tasks.find(function (task) {
-        return task.id === id;
-    });
-    if (!task) {
-        return;
-    }
-    // Put task data inside modal
-    document.getElementById("editTaskId").value =task.id;
-    document.getElementById("editTaskName").value = task.name;
-    document.getElementById("editTaskDescription").value =  task.description;
-    // Open Bootstrap Modal
-    let modal =  new bootstrap.Modal(document.getElementById("editModal"));
-    modal.show();
-}
-// 
-// UPDATE TASK
-// 
+//update //
+// function creatdata(i){
+//      taskName.value = tasks[i].name;
+//      taskDescription.value = tasks[i].description;
+//      count.value = tasks[i].count;
+// }
 
 function updateTask() {
-    let id = Number( document.getElementById("editTaskId").value );
-    let name = document.getElementById("editTaskName").value;
-    let description = document.getElementById("editTaskDescription").value;
+    let id =  Number( document.querySelector("#editTaskId").value
+        );
+    let name = document.querySelector("#editTaskName").value;
+    let description = document.querySelector("#editTaskDescription").value;
     if (name === "" || description === "") {
         alert("Please fill all fields");
         return;
@@ -159,15 +113,7 @@ function updateTask() {
     saveTasks();
     displayTasks();
     // Close modal
-    let modalElement = document.getElementById("editModal");
+    let modalElement = document.querySelector("#editModal");
     let modal = bootstrap.Modal.getInstance(modalElement);
     modal.hide();
-}
-// SAVE TASKS IN LOCAL STORAGE
-function saveTasks() {
-    localStorage.setItem(
-        "tasks",
-        JSON.stringify(tasks)
-    );
-
 }
